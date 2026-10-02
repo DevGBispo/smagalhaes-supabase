@@ -3,7 +3,6 @@ import {PORTALS} from './lookup.js';
 import PROGRAMACAO from './programacao.json' with {type:'json'};
 import HTML from './index.html';
 const SOURCE={BTP:PORTALS.BTP,ECOPORTO:SOURCE_URL,'SANTOS BRASIL':PORTALS['Santos Brasil'],'DP WORLD':'https://www.dpworld.com/pt-br/ports-terminals/brazil'};
-const selected=new Map(); // transient per Worker isolate only, never persistent
 let cached=null;
 let running=null;
 const NOW=()=>new Date().toISOString();
@@ -29,8 +28,22 @@ async function refresh(){if(running)return running;
   return {ok:true,read_at_source:result.rows.length,found_in_report:matches.length,persisted:false};
  }catch(e){cached={...(cached||{rows:[],last_success:null}),last_attempt:attempted,status:'erro',error:String(e.message||e).slice(0,220)};return {ok:false,error:cached.error,persisted:false};}
  })();try{return await running;}finally{running=null;}}
+function secure(req, env) {
+ const password=env?.ACCESS_PASSWORD;
+ if (typeof password!=='string'||password.length<20) return {error:'Access password not configured',status:503};
+ const auth=req.headers.get('authorization')||'';
+ if(!auth.startsWith('Basic ')) return {error:'Authentication required',status:401};
+ let raw;try{raw=atob(auth.slice(6));}catch{return {error:'Authentication required',status:401};}
+ const sep=raw.indexOf(':');const user=sep===-1?'':raw.slice(0,sep),pass=sep===-1?'':raw.slice(sep+1);
+ if(user!=='monitor'||pass.length!==password.length)return {error:'Authentication required',status:401};
+ let mismatch=0;for(let i=0;i<pass.length;i++)mismatch|=pass.charCodeAt(i)^password.charCodeAt(i);
+ return mismatch===0?null:{error:'Authentication required',status:401};
+}
 export default {
- async fetch(req){const url=new URL(req.url),route=url.pathname,method=req.method;
+ async fetch(req,env){const url=new URL(req.url),route=url.pathname,method=req.method;
+  if(route==='/health')return output({ok:true,backend:true,platform:'cloudflare-worker',authentication:'required',storage:'transient'});
+  const authError=secure(req,env);
+  if(authError)return new Response(JSON.stringify(authError),{status:authError.status,headers:{'content-type':'application/json; charset=utf-8','www-authenticate':'Basic realm="Smagalhaes Monitor"','cache-control':'no-store'}});
   if(method==='GET'&&(route==='/'||route==='/index.html'))return output(HTML,200,'text/html; charset=utf-8');
   if(method==='GET'&&(route==='/api/health'||route==='/health'))return output({ok:true,backend:true,platform:'cloudflare-worker',source_ecoporto:SOURCE_URL,storage:'transient'});
   if(method==='GET'&&route==='/api/programacao')return output({origin:PROGRAMACAO.origin,issued_at:PROGRAMACAO.issued_at,row_count:PROGRAMACAO.rows.length,navios:GROUPS.length});
