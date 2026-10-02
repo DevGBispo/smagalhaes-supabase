@@ -1,9 +1,5 @@
-node_modules
-.next
-out
+node_modules/
+.wrangler/
+.dev.vars
 .env
-.env.local
-.env.production
-.vercel
-.DS_Store
 *.log

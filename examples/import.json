@@ -1,0 +1,35 @@
+{
+  "source": "Exemplo extraído e normalizado manualmente da programação 02/10/2026 (não é importação de PDF)",
+  "rows": [
+    {
+      "terminal": "BTP",
+      "ship": "MSC DAMLA",
+      "voyage": "",
+      "reservation": "241ISZ2627725",
+      "client": "GAROTO - 3617",
+      "deadline": "2026-10-03T12:00:00-03:00",
+      "qty20": 0,
+      "qty40": 4
+    },
+    {
+      "terminal": "BTP",
+      "ship": "MSC DAMLA",
+      "voyage": "",
+      "reservation": "276444293",
+      "client": "NESTLE - 2641",
+      "deadline": "2026-10-03T12:00:00-03:00",
+      "qty20": 0,
+      "qty40": 1
+    },
+    {
+      "terminal": "BTP",
+      "ship": "MSC ALBANY",
+      "voyage": "",
+      "reservation": "241ISZ2627273",
+      "client": "SYLVAMO - 3181",
+      "deadline": "2026-10-05T18:00:00-03:00",
+      "qty20": 0,
+      "qty40": 2
+    }
+  ]
+}

@@ -1,86 +1,11 @@
-# Smagalhães Supabase — Teste
+# Smagalhaes Vessel Monitor — standalone Worker deployment
 
-Este repositório recria uma versão isolada do **Controle de Embarque Smagalhães** para testar a resposta do Supabase sem afetar o sistema principal em produção.
+Branch isolated from `main` of smagalhaes-supabase. This branch deliberately contains only a Cloudflare Worker backend, not the Next.js site.
 
-## Objetivo
+Deploy as a **new Cloudflare Worker**, choose repo `DevGBispo/smagalhaes-supabase`, branch `poc/vessel-monitor-standalone`, root directory `/`, build `npm run build`, deploy `npx wrangler deploy`. Worker name `smagalhaes-vessel-monitor-poc`.
 
-Validar, em ambiente separado:
+**Stage 1:** `GET /health` works even without a D1 binding. Protected API routes return 503 until D1 is attached and `ADMIN_TOKEN` set. `ADAPTER_MODE=probe` performs reachability checks only; never claims ship data is collected. Automated cron only performs empty database reads after D1 binding; without D1 it fails harmlessly but creates logs. If desired disable cron in dashboard until DB is attached.
 
-- estrutura de tabelas no Supabase;
-- motoristas e chapeiras;
-- programação de embarque;
-- confirmação de veículos carregados;
-- chamada de motoristas;
-- log de alterações;
-- responsividade do painel;
-- preparação para realtime.
+**Stage 2:** Create D1 database `vessel_monitor_poc` in Cloudflare, apply `migrations/0001_init.sql` using D1 console or Wrangler, add Worker D1 binding `DB`, set secret `ADMIN_TOKEN` (at least 24 random characters, do not commit). **Never replace a production binding.** Test `/health`, import sample via `/api/program/import`, and `/api/monitor/run`.
 
-## O que já existe neste teste
-
-- Painel operacional.
-- Controle de embarques.
-- Nova programação de teste.
-- Chamada de motoristas.
-- Motoristas com alteração de status.
-- Log de alterações gerado por ações operacionais.
-- Destaque verde para embarques concluídos.
-- Modo simulação local quando Supabase ainda não está configurado.
-- Estrutura SQL inicial em `supabase/schema.sql`.
-
-## Como rodar localmente
-
-```bash
-npm install
-npm run dev
-```
-
-Depois acesse:
-
-```txt
-http://localhost:3000
-```
-
-## Como conectar ao Supabase
-
-1. Crie um projeto no Supabase.
-2. Abra o SQL Editor.
-3. Execute o arquivo:
-
-```txt
-supabase/schema.sql
-```
-
-4. Copie `.env.example` para `.env.local`.
-5. Preencha:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-```
-
-6. Rode novamente:
-
-```bash
-npm run dev
-```
-
-## Observação importante sobre segurança
-
-As políticas RLS do arquivo `schema.sql` estão propositalmente abertas para teste controlado.
-
-Antes de produção, substituir por políticas baseadas em:
-
-- usuário autenticado;
-- nível de acesso;
-- permissões por área;
-- bloqueio de alterações indevidas.
-
-## Produção atual
-
-Este repositório não substitui o sistema atual. Ele serve apenas como laboratório para decidir se vale migrar do banco atual para Supabase.
-
-Sistema principal permanece no repositório:
-
-```txt
-DevGBispo/Smagalhaes
-```
+See docs/POC.md for data format. No frontend; no terminal scraping implemented yet.

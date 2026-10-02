@@ -1,0 +1,11 @@
+{
+  "name": "smagalhaes-vessel-monitor-poc",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "vars": {
+    "ADAPTER_MODE": "probe",
+    "ALLOW_DEMO": "false"
+  },
+  "triggers": { "crons": ["*/30 * * * *"] }
+}

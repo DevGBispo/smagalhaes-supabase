@@ -1,0 +1,7 @@
+# Copy to .dev.vars (never commit real tokens).
+ADMIN_TOKEN=replace-with-random-long-secret
+# Default is 'probe' (source connectivity checks only). For local simulated observations: mock
+ADAPTER_MODE=mock
+ALLOW_DEMO=true
+# In mock mode provide records under observations; modify them across runs to test change detection.
+DEMO_OBSERVATIONS_JSON={"observations":[{"terminal":"BTP","ship":"MSC DAMLA","voyage":"", "eta":null,"etb":null,"gate_open":null,"deadline":"2026-10-03T12:00:00-03:00"}]}
