@@ -1,0 +1,17 @@
+{
+  "name": "smagalhaes-vessel-monitor-poc",
+  "main": "src/index.js",
+  "compatibility_date": "2026-09-01",
+  "workers_dev": true,
+  "vars": {
+    "ADAPTER_MODE": "probe",
+    "ALLOW_DEMO": "false"
+  },
+  "triggers": { "crons": ["*/30 * * * *"] },
+  "d1_databases": [{
+    "binding": "DB",
+    "database_name": "vessel_monitor_poc",
+    "database_id": "91f2cb6a-25a9-42e7-a6be-d080181c5c73",
+    "migrations_dir": "migrations"
+  }]
+}
